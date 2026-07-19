@@ -1,0 +1,34 @@
+version: '3.4'
+
+services:
+  weaviate:
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - '8080'
+      - --scheme
+      - http
+    image: cr.weaviate.io/semitechnologies/weaviate:1.27.0 # Use the latest stable v1.26+ version
+    ports:
+      - 8080:8080
+      - 50051:50051
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: on-failure:0
+    environment:
+      # Vectorizer & Generative modules to enable
+      ENABLE_MODULES: 'text2vec-openai,text2vec-cohere,text2vec-huggingface,generative-openai'
+      # Fallback when no explicit vectorizer is chosen in the collection schema
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      
+      # Storage and Cluster setup
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      CLUSTER_HOSTNAME: 'node1'
+      QUERY_DEFAULTS_LIMIT: 25
+
+      # Authentication (Set to false/true respectively to lock it down)
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+
+volumes:
+  weaviate_data:
